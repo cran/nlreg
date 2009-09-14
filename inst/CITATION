@@ -1,0 +1,27 @@
+citHeader("To cite the nlreg package in publications use:")
+
+citEntry(entry="article",
+         title    = "{hoa}: {An} {R} package bundle for higher order likelihood inference",
+         author   = person(first="Alessandra", middle="R.", 
+                           last="Brazzale", 
+                           email="alessandra.brazzale@isib.cnr.it"),
+         journal  = "Rnews",
+         volume   = "5/1 {May} 2005",
+         year     = "2005",
+         pages    = "20--27",
+         note     = "{ISSN} 609-3631",
+         url      = "ftp://cran.r-project.org/doc/Rnews/Rnews_2005-1.pdf",
+         
+         textVersion = 
+         paste("Brazzale, A.R. (2005).  hoa: An R package bundle for ", 
+               "higher order likelihood inference.  Rnews, 5/1 ",
+               "May 2005, 20-27.  ISSN 609-3631, ",
+               "URL ftp://cran.r-project.org/doc/Rnews/Rnews_2005-1.pdf.",
+               sep="")
+         )
+citFooter("Examples of applications, and generally of the use of 
+           likelihood asymptotics, are given in\n\n
+           Brazzale, A.R., Davison, A.C. and Reid, N. (2007).  Applied 
+           Asymptotics: Case Studies in Small-Sample Statistics.  
+           Cambridge University Press, Cambridge.  
+           URL http://statwww.epfl.ch/AA/")
