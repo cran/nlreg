@@ -12,16 +12,14 @@ for nonlinear models with possibly non constant variance
 \details{
 \tabular{ll}{
 Package: \tab nlreg\cr
-Version: \tab 1.1-3\cr
-Date: \tab 2009-09-14\cr
+Version: \tab 1.2-0\cr
+Date: \tab 2009-10-03\cr
 URL: \tab http://www.r-project.org, http://statwww.epfl.ch/AA/\cr
 Depends: \tab R (>= 2.6.0), statmod, survival\cr
 Suggests: \tab boot, cond, csampling, marg\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
-Packaged: \tab 2009-09-14 12:39:06 UTC; brazzale\cr
-Built: \tab R 2.9.2; ; 2009-09-14 12:45:34 UTC; unix\cr
 }
 
 Index:
@@ -101,10 +99,4 @@ Douglas Bates.
 
 Maintainer: Alessandra R. Brazzale <alessandra.brazzale@unimore.it>
 }
-\references{
-}
 \keyword{ package }
-\seealso{
-}
-\examples{
-}

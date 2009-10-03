@@ -21,4 +21,10 @@ Version 1.1-2
 
     o Fixed bug in "plot.nlreg.contours"
 
-Version 1.1-3: unbundled package 
+Version 1.1-3: 
+
+    o Unbundled package 
+
+Version 1.2: 
+
+    o Fixed documentation

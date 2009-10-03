@@ -28,7 +28,7 @@ var2cor(object, \dots)
   the correlation matrix of the estimates from a fitted model.
 }
 \seealso{
-  \code{\link[nlreg]{var2cor.nlreg}}, \code{\link[nlreg]{var2cor.mpl}}, 
+  \code{\link{var2cor.nlreg}}, \code{\link{var2cor.mpl}}, 
   \code{\link[utils]{methods}}
 }
 \examples{

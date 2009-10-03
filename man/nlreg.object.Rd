@@ -134,7 +134,7 @@
 \section{Methods}{
   Objects of this class have methods for the functions 
   \code{\link[base]{print}}, \code{\link[base]{summary}}, 
-  \code{\link[stats]{fitted}} among others.
+  \code{\link{fitted}} among others.
 }
 \note{
   The residuals, fitted values and coefficients should be extracted by
