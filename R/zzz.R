@@ -1,15 +1,13 @@
-.First.lib <- function(libname, pkgname)
+.onLoad <- function(libname, pkgname)
 {
-  version <- as.character("1.2-0 (2009/10/03)")
-  cat("\n   Package \"nlreg\"", version, "\n")
-  cat("   Copyright (C) 2000-2009 R. Bellio & A. R. Brazzale\n\n")
-  cat("This is free software, and you are welcome to redistribute\n")
-  cat("it and/or modify it under the terms of the GNU General\n")
-  cat("Public License published by the Free Software Foundation.\n")
-  cat("Package \"nlreg\" comes with ABSOLUTELY NO WARRANTY.\n\n")
-  cat("type `help(package=\"nlreg\")' for summary information\n")
-  invisible(require(stats))
-  invisible(require(graphics))
-  invisible(require(statmod))
+  version <- as.character("1.2-1 (2011/11/23)")
+  psm <- paste("\n   Package \"nlreg\"", version, "\n",
+    "   Copyright (C) 2000-2011 R. Bellio & A. R. Brazzale\n\n",
+    "This is free software, and you are welcome to redistribute\n",
+    "it and/or modify it under the terms of the GNU General\n",
+    "Public License published by the Free Software Foundation.\n",
+    "Package \"nlreg\" comes with ABSOLUTELY NO WARRANTY.\n\n",
+    "type `help(package=\"nlreg\")' for summary information\n")
+  packageStartupMessage(psm)
   invisible()
 }

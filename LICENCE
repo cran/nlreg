@@ -11,7 +11,7 @@ Copyrights
 ==========
 
 File nlreg/R/nlreg.R 
-  Copyright (C) 2000-2009 Alessandra R. Brazzale & Ruggero Bellio
+  Copyright (C) 2000-2011 Alessandra R. Brazzale & Ruggero Bellio
 
 
 Our understanding is that the dataset files nlreg/data/*.rda are not
@@ -42,4 +42,4 @@ The file COPYING in the R top-level directory is a copy of the `GNU
 General Public License'.
 
 
-alessandra.brazzale@unimore.it
+alessandra.brazzale@unipd.it
