@@ -186,6 +186,7 @@
   \code{\link[graphics]{contour}}
 }
 \examples{
+\dontrun{
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 
@@ -195,7 +196,7 @@ metsulfuron.nl <-
 ##
 metsulfuron.prof <- profile( metsulfuron.nl, trace = TRUE )
 par( mai = rep(0.2, 4) )
-contour( metsulfuron.prof )
+contour( metsulfuron.prof )}
 }
 \keyword{methods}
 \keyword{nonlinear}

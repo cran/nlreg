@@ -10,10 +10,11 @@
   and for the interpretation of \code{digits}.
 }
 \usage{
-\method{print}{nlreg}(x, digits = value, \dots)
-}
-\synopsis{
 \method{print}{nlreg}(x, digits = max(3, getOption("digits")-3), \dots)
+}
+\details{
+  The method defaults to:
+\preformatted{plot.nlreg(x, digits = max(3, getOption("digits")-3), \dots)}
 }
 \seealso{
   \code{\link[nlreg]{nlreg.object}}, \code{\link[base]{print}},

@@ -11,16 +11,14 @@
   \code{x} and \code{digits}.  
 }
 \usage{
-\method{print}{summary.mpl}(x, corr = FALSE, digits = value, \dots)
-}
-\synopsis{
-\method{print}{summary.mpl}(x, corr = FALSE, 
-                            digits = if(!is.null(x$digits)) x$digits 
-                                     else max(3, getOption("digits")-3), 
-                            \dots)
+\method{print}{summary.mpl}(x, corr = FALSE, digits, \dots)
 }
 \details{
-  The \code{corr} argument is a logical value indicating whether the 
+  The function defaults to:
+\preformatted{print.summary.mpl(x, corr = FALSE, 
+                  digits = if(!is.null(x$digits)) x$digits 
+                           else max(3, getOption("digits")-3), \dots)}
+The \code{corr} argument is a logical value indicating whether the 
   (asymptotic) correlation matrix of the \acronym{MLE}s of the
   regression coefficients should be printed.
 }

@@ -141,18 +141,6 @@
   \code{\link[base]{summary}}
 }
 \examples{
-%\dontrun{
-%data(ria)
-%ria.nl <- nlreg(formula = count~b1+(b2-b1)/(1+(conc/b4)^b3), 
-%                weights = ~(b1+(b2-b1)/(1+(conc/b4)^b3))^g, data = ria, 
-%                start = c(b1 = 1.6, b2 = 20, b3 = 2, b4 = 300, g = 2), 
-%                hoa = T, trace = T)
-%##
-%ria.mpl <- mpl(ria.nl, trace = T)
-%summary(ria.mpl)
-%}
-%##
-%##
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 

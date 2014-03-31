@@ -76,6 +76,7 @@
   \code{\link[nlreg]{profile.nlreg}}, \code{\link[base]{summary}}
 }
 \examples{
+\dontrun{
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 
@@ -84,7 +85,7 @@ metsulfuron.nl <-
            hoa = TRUE )
 ##
 metsulfuron.prof <- profile( metsulfuron.nl, trace = TRUE )
-summary( metsulfuron.prof, alpha = c(0.1, 0.05) )
+summary( metsulfuron.prof, alpha = c(0.1, 0.05) )}
 }
 \keyword{methods}
 \keyword{regression}

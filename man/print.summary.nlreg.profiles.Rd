@@ -15,18 +15,17 @@
   \code{digits}.
 }
 \usage{
-\method{print}{summary.nlreg.profile}(x, digits = value, \dots)
-\method{print}{summary.all.nlreg.profiles}(x, digits = value, \dots)
+\method{print}{summary.nlreg.profile}(x, digits, \dots)
+\method{print}{summary.all.nlreg.profiles}(x, digits, \dots)
 }
-\synopsis{
-\method{print}{summary.nlreg.profile}(x, 
-                                      digits = if(!is.null(x$digits)) x$digits
-                                               else max(3, getOption("digits")-3),
-                                      \dots)
-\method{print}{summary.all.nlreg.profiles}(x, 
-                                      digits = if(!is.null(x$digits)) x$digits
-                                               else max(3, getOption("digits")-3),
-                                      \dots)
+\details{
+  The function defaults to:
+\preformatted{print.summary.nlreg.profile(x, 
+                            digits = if(!is.null(x$digits)) x$digits
+                                     else max(3, getOption("digits")-3), \dots)}
+\preformatted{print.summary.all.nlreg.profiles(x, 
+                                 digits = if(!is.null(x$digits)) x$digits
+                                          else max(3, getOption("digits")-3), \dots)}
 }
 \seealso{
   \code{\link[nlreg]{summary.nlreg.profile}},

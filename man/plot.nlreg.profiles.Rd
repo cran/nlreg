@@ -19,16 +19,6 @@
      lty1 = "solid", lty2 = "solid", cl1 = "blue", cl2 = "red", 
      col = "black", ylim = c(-3,3), \dots)
 }
-\synopsis{
-\method{plot}{nlreg.profile}(x = stop("nothing to plot"), alpha = 0.05, add.leg = FALSE, stats = c("sk", "fr"), 
-     cex = 0.7, cex.lab = 1, cex.axis = 1, cex.main = 1, lwd1 = 1, lwd2 = 2, 
-     lty1 = "solid", lty2 = "solid", cl1 = "blue", cl2 = "red", col = "black", 
-     ylim = c(-3,3), \dots)
-\method{plot}{all.nlreg.profiles}(x = stop("nothing to plot"), nframe, alpha = 0.05, stats = c("sk", "fr"), 
-     cex = 0.7, cex.lab = 1, cex.axis = 1, cex.main = 1, lwd1 = 1, lwd2 = 2, 
-     lty1 = "solid", lty2 = "solid", cl1 = "blue", cl2 = "red", col = "black", 
-     ylim = c(-3,3), \dots)
-}
 \arguments{
   \item{x}{
     an object of class \code{profile.nlreg} or 
@@ -89,6 +79,17 @@
 \section{Side Effects}{
   A plot is produced on the current graphics device.
 }
+\details{
+  The function defaults to:
+\preformatted{plot.nlreg.profile(x = stop("nothing to plot"), alpha = 0.05, add.leg = FALSE, 
+                   stats = c("sk", "fr"), cex = 0.7, cex.lab = 1, cex.axis = 1, 
+                   cex.main = 1, lwd1 = 1, lwd2 = 2, lty1 = "solid", lty2 = "solid", 
+                   cl1 = "blue", cl2 = "red", col = "black", ylim = c(-3,3), \dots)}
+\preformatted{plot.all.nlreg.profiles(x = stop("nothing to plot"), nframe, alpha = 0.05, 
+                        stats = c("sk", "fr"), cex = 0.7, cex.lab = 1, cex.axis = 1, 
+                        cex.main = 1, lwd1 = 1, lwd2 = 2, lty1 = "solid", lty2 = "solid", 
+                        cl1 = "blue", cl2 = "red", col = "black", ylim = c(-3,3), \dots)}
+}	
 \references{
   Fraser, D.A.S., Reid, N. and Wu, J. (1999).  A simple general formula 
   for tail probabilities for frequentist and Bayesian inference. 
@@ -103,6 +104,7 @@
   \code{\link[graphics]{plot}}
 }
 \examples{
+\dontrun{
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 
@@ -114,7 +116,7 @@ metsulfuron.prof <- profile( metsulfuron.nl, offset = g, trace = TRUE )
 plot( metsulfuron.prof, lwd2 = 2 )
 ##
 metsulfuron.prof <- profile( metsulfuron.nl, trace = TRUE )
-plot( metsulfuron.prof, lwd2 = 2, nframe = c(2,3) )
+plot( metsulfuron.prof, lwd2 = 2, nframe = c(2,3) )}
 }
 \keyword{methods}
 \keyword{regression}

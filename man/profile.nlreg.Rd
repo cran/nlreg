@@ -171,6 +171,7 @@
   \code{\link[stats]{profile}} 
 }
 \examples{
+\dontrun{
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 
@@ -182,7 +183,7 @@ metsulfuron.prof <- profile( metsulfuron.nl, offset = g, trace = TRUE )
 plot( metsulfuron.prof, lwd2 = 2 )
 #
 metsulfuron.prof <- profile( metsulfuron.nl, trace = TRUE )
-plot( metsulfuron.prof, nframe = c(2,3), lwd2 = 2 )
+plot( metsulfuron.prof, nframe = c(2,3), lwd2 = 2 )}
 }
 \keyword{regression}
 \keyword{nonlinear}

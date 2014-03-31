@@ -29,6 +29,14 @@ Version 1.2:
 
     o Fixed documentation
 
-Version 1.2.1: 
+Version 1.2-1: 
 
     o Updated to R version 2.14.0
+
+Version 1.2-2: 
+
+    o Updated to R version 3.0.0
+    
+    o Fixed scoping rules
+    
+    o Generalized "nlreg.diag"

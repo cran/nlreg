@@ -1,6 +1,6 @@
-## file nlreg/R/nlreg.R, v 1.2-1 2011/11/23
+## file nlreg/R/nlreg.R, v 1.2-2 2014-03-31
 ##
-##  Copyright (C) 2000-2011 Ruggero Bellio & Alessandra R. Brazzale 
+##  Copyright (C) 2000-2014 Ruggero Bellio & Alessandra R. Brazzale 
 ##
 ##  This file is part of the "nlreg" package for R.  This program is 
 ##  free software; you can redistribute it and/or modify it under the 
@@ -29,7 +29,7 @@ Dmean <- function(nlregObj, hessian = TRUE)
 {
   rc <- nlregObj$coef 
   do.call("deriv3", list(expr = nlregObj$meanFun, namevec = names(rc),
-	                 function.arg = names(nlregObj$ws$allPar), 
+	                 function.arg = c(names(nlregObj$ws$allPar), "..."), 
                          hessian = hessian))
 }
 
@@ -41,7 +41,7 @@ Dvar <- function(nlregObj, hessian = TRUE)
                c(names(rc), names(vp))
              else names(vp)
   do.call("deriv3", list(expr = nlregObj$varFun, namevec = namevec,
-                         function.arg = names(nlregObj$ws$allPar), 
+                         function.arg = c(names(nlregObj$ws$allPar), "..."), 
                          hessian = hessian))
 }  
 
@@ -132,22 +132,37 @@ nlreg <- function(formula, weights = NULL,
             else offset
     if( !missingData )
     {
-      cov.pos <- match(names(data), all.vars(mFormula))
-      cov.pos <- !is.na(cov.pos)    
-      new.data <- list( (xx <- unique(unlist(data[cov.pos]))),  
-                tapply(unlist(data[cov.pos]), unlist(data[cov.pos]),
-                       function(x) sum(duplicated(x)) + 1)[order(xx)],
-                match(unlist(data[cov.pos]), 
-                      unique(unlist(data[cov.pos]))),
-                tapply(eval(formula[[2]], data), 
-                       unlist(data[cov.pos]),
-                       function(x) sum(x))[order(xx)],
-                tapply(eval(formula[[2]], data), 
-                       unlist(data[cov.pos]),
-                       function(x) sum(x^2))[order(xx)] )          
-      new.data <- lapply(new.data, as.vector)
-      names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", 
-                           "t1", "t2")
+      .nd <- names(data)
+      .md <- match(".addVar", .nd, nomatch=0)
+      if(.md > 0)
+      {
+        .nd[.md] <- NA	        
+        cov.pos <- as.logical(match(.nd, all.vars(formula[[3]]), nomatch=0))
+        xx <- unlist(data[cov.pos])
+        yval <- eval(formula[[2]], data)
+        new.data <- list( xx=xx, repl=rep(1, n), dupl=1:n, t1=yval, t2=yval^2)
+        new.data <- lapply(new.data, as.vector)
+        names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", "t1", "t2")
+      }
+      else
+      {
+        cov.pos <- match(names(data), all.vars(mFormula))
+        cov.pos <- !is.na(cov.pos)    
+        new.data <- list( (xx <- unique(unlist(data[cov.pos]))),  
+                  tapply(unlist(data[cov.pos]), unlist(data[cov.pos]),
+                         function(x) sum(duplicated(x)) + 1)[order(xx)],
+                  match(unlist(data[cov.pos]), 
+                        unique(unlist(data[cov.pos]))),
+                  tapply(eval(formula[[2]], data), 
+                         unlist(data[cov.pos]),
+                         function(x) sum(x))[order(xx)],
+                  tapply(eval(formula[[2]], data), 
+                         unlist(data[cov.pos]),
+                         function(x) sum(x^2))[order(xx)] )          
+        new.data <- lapply(new.data, as.vector)
+        names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", 
+                             "t1", "t2")
+      }                       
     }
     else
     {
@@ -377,21 +392,36 @@ nlreg <- function(formula, weights = NULL,
                            subset=subset)	
     n <- length(more.fit$resid)
     if( !missing(data) )
-    {
-      cov.pos <- match(names(data), all.vars(formula[[3]]))
-      cov.pos <- !is.na(cov.pos) 
-      new.data <- list( (xx <- unique(unlist(data[cov.pos]))),  
-           tapply(unlist(data[cov.pos]), unlist(data[cov.pos]),
-                  function(x) sum(duplicated(x)) + 1)[order(xx)], 
-           match(unlist(data[cov.pos]), 
-                 unique(unlist(data[cov.pos]))),	
-           tapply(eval(formula[[2]], data), unlist(data[cov.pos]),
-                  function(x) sum(x))[order(xx)],
-           tapply(eval(formula[[2]], data), unlist(data[cov.pos]),
-                  function(x) sum(x^2))[order(xx)] )    
-      new.data <- lapply(new.data, as.vector)
-      names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", 
-                           "t1", "t2")
+    {    	
+      .nd <- names(data)
+      .md <- match(".addVar", .nd, nomatch=0)
+      if(.md > 0)
+      {
+        .nd[.md] <- NA	        
+        cov.pos <- as.logical(match(.nd, all.vars(formula[[3]]), nomatch=0))
+        xx <- unlist(data[cov.pos])
+        yval <- eval(formula[[2]], data)
+        new.data <- list( xx=xx, repl=rep(1, n), 1:n, t1=yval, t2=yval^2)
+        new.data <- lapply(new.data, as.vector)
+        names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", "t1", "t2")
+      }
+      else
+      {
+        cov.pos <- match(names(data), all.vars(formula[[3]]))		## 20.05.13      
+        cov.pos <- !is.na(cov.pos) 
+        new.data <- list( (xx <- unique(unlist(data[cov.pos]))),  
+             tapply(unlist(data[cov.pos]), unlist(data[cov.pos]),
+                    function(x) sum(duplicated(x)) + 1)[order(xx)], 
+             match(unlist(data[cov.pos]), 
+                   unique(unlist(data[cov.pos]))),	
+             tapply(eval(formula[[2]], data), unlist(data[cov.pos]),
+                    function(x) sum(x))[order(xx)],
+             tapply(eval(formula[[2]], data), unlist(data[cov.pos]),
+                    function(x) sum(x^2))[order(xx)] )    
+        new.data <- lapply(new.data, as.vector)
+        names(new.data) <- c(names(data)[cov.pos], "repl", "dupl", 
+                             "t1", "t2")
+      }
     }
     else
     {
@@ -539,28 +569,38 @@ summary.nlreg <- function(object, observed = TRUE,
   v <- nlregObj$weights
   .probl <- ( nlregObj$ws$homVar && !is.null(of) )
   if( .probl )
-    .probl <- ( names(of) =="logs" )			
-  attach(nlregObj$data, warn.conflicts = FALSE)
+    .probl <- ( names(of) =="logs" )	
+#  attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
   tmp <- as.list(par)
+  tmp <- c(nlregObj$data, tmp)
   temp <- if( nlregObj$ws$hoa ) 
+          {
+          	formals(md) <- tmp
             do.call("md", tmp)
-  	  else  
-  	  {
-  	    cat("\ndifferentiating mean function -- may take a while")
+          }  
+  	      else  
+  	      {
+  	        cat("\ndifferentiating mean function -- may take a while")
             tmp.fun <- Dmean(nlregObj)
+          	formals(tmp.fun) <- tmp
             do.call("tmp.fun", tmp)
-  	  }
+  	      }
   m1 <- attr(temp, "gradient") ; m1[!is.finite(m1)] <- 0
   m2 <- attr(temp, "hessian") ; m2[!is.finite(m2)] <- 0 
   if( !.probl )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- if( nlregObj$ws$hoa )
+            {
+              formals(vd) <- tmp
               do.call("vd", tmp)
-  	    else  
-  	    {
-  	      cat("\ndifferentiating variance function -- may take a while")
+            }  
+  	        else  
+  	        {
+  	          cat("\ndifferentiating variance function -- may take a while")
               tmp.fun <- Dvar(nlregObj)
+              formals(tmp.fun) <- tmp
               do.call("tmp.fun", tmp)
             }
     v1 <- attr(temp, "gradient")  ; v1[!is.finite(v1)] <- 0    
@@ -570,7 +610,7 @@ summary.nlreg <- function(object, observed = TRUE,
   {
     v1 <- v2 <- NULL
   }
-  detach(nlregObj$data)
+#  detach(nlreg.data)		## 20.05.13
   if( !nlregObj$ws$hoa )  cat("\n")
   info <- if( observed )  
             obsInfo.nlreg(nlregObj, par, mu, v, m1, m2, v1, v2)
@@ -713,7 +753,7 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
     nlregHoa <- nlregObj
     nlregHoa$meanFun[[2]] <- call("+", nlregHoa$meanFun[[2]], 
                                   call("*", as.name("phi"), 
-                                  as.name("addVar")))
+                                  as.name(".addVar")))
     nlregHoa$coef <- c(nlregHoa$coef, phi=0)
     nlregHoa$ws$allPar <- c(nlregHoa$ws$allPar, phi=0)
     cat("\ndifferentiating mean function -- may take a while")
@@ -724,11 +764,13 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
       vd <- Dvar(nlregHoa)
     }
     cut.idx <- length(rc) + 1		 
-    addVar <- rep(0, length(nlregObj$data$repl))  
-    nlregHoa$data <- c(nlregHoa$data, list(addVar=addVar))
-    attach(nlregHoa$data, warn.conflicts = FALSE)
+    .addVar <- rep(0, length(nlregObj$data$repl))  
+    nlregHoa$data <- c(nlregHoa$data, list(.addVar=.addVar))
+#    attach(nlregHoa$data, warn.conflicts = FALSE)		## 20.05.13
     new.par <- nlregHoa$ws$allPar
     tmp <- as.list(new.par)
+    tmp <- c(nlregHoa$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
     m2.0 <- attr(temp, "hessian") ; m2.0[!is.finite(m2.0)] <- 0	
@@ -736,6 +778,7 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
     m2.cut <- m2.0[,-cut.idx, -cut.idx, drop=FALSE]
     if(!.probl) 
     {
+      formals(vd) <- tmp
       temp <- do.call("vd", tmp) 
       v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
       v2.0 <- attr(temp, "hessian") ; v2.0[!is.finite(v2.0)] <- 0
@@ -751,11 +794,12 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
       v1.0 <- v2.0 <- v1.cut <- v2.cut <- NULL 
     }
     M1.0 <- m1.cut[dupl,]
-    detach(nlregHoa$data)
+#    detach(nlregHoa$data)		## 20.05.13
     i.0 <- expInfo.nlreg(nlregObj, par, mu, v, m1.cut, v1.cut)
     j.0 <- obsInfo.nlreg(nlregObj, m1=m1.cut, m2=m2.cut, 
 	                 v1=v1.cut, v2=v2.cut)
-    if( infl && !nlregObj$ws$homVar && !is.null(nlregObj$varPar ) )
+#    if( infl && !nlregObj$ws$homVar && !is.null(nlregObj$varPar ) )
+    if( infl && !is.null(nlregObj$varPar ) )		## 14.06.13
     {
       mle.rc <- solve(j.0[names(rc), names(rc), drop=FALSE], 
                       j.0[names(rc), names(vp), drop=FALSE])
@@ -773,13 +817,23 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
     if( nlregObj$ws$hoa )
       newCall$hoa <- FALSE
     newCall$data <- NULL
-    newData <- eval(nlregObj$ws$frame)
+###    newData <- eval(nlregObj$ws$frame)		## 24.05.13
+    if(!is.null(nlregObj$ws$frame))
+      newData <- eval(nlregObj$ws$frame)
+    else
+    {
+      .allVars <- all.vars(nlregObj$call$formula)
+      .start <- names(nlregObj$call$start)
+      .modVars <- .allVars[!match(.allVars, .start, nomatch=0)]	
+      newData <- sapply(.modVars, function(x) eval(as.name(x)))
+    }	    
     logLik.0 <- nlregObj$logLik
     phi.h <- logLik.1 <- j.1 <- i.1 <- S.1 <- q.1 <- rep(NA, length(v))
   }
   else
   {
-    if( infl && !nlregObj$ws$homVar )
+#    if( infl && !nlregObj$ws$homVar )
+    if( infl )		## 14.06.13
     {
       md <- if(nlregObj$ws$hoa )  
               nlregObj$ws$md
@@ -806,7 +860,7 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
               Dmean(nlregObj, hessian=FALSE)
             }
       if( !.probl )
-	vd <- if(nlregObj$ws$hoa )  
+	  vd <- if(nlregObj$ws$hoa )  
                 nlregObj$ws$vd
               else  
               {
@@ -814,20 +868,24 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
                 Dvar(nlregObj, hessian=FALSE)
               }
     }
-    attach(nlregObj$data, warn.conflicts = FALSE)
+#    attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
     tmp <- as.list(nlregObj$ws$allPar)
+    tmp <- c(nlregObj$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
-    if( infl && !nlregObj$ws$homVar )
+#    if( infl && !nlregObj$ws$homVar )
+    if( infl )		## 14.06.13
     { 
       m2.0 <- attr(temp, "hessian") ; m2.0[!is.finite(m2.0)] <- 0 
     }
     if(!.probl) 
     {
-      tmp <- as.list(nlregObj$ws$allPar)
+      formals(vd) <- tmp
       temp <- do.call("vd", tmp)
       v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
-      if( infl && !nlregObj$ws$homVar )
+#      if( infl && !nlregObj$ws$homVar )
+      if( infl )		## 14.06.13
       { 
         v2.0 <- attr(temp, "hessian") ; v2.0[!is.finite(v2.0)] <- 0 
       }
@@ -837,9 +895,10 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
       v1.0 <- v2.0 <- NULL 
     }
     M1.0 <- m1.0[dupl,]
-    detach(nlregObj$data)
+#    detach(nlregObj$data)		## 20.05.13
     i.0 <- expInfo.nlreg(nlregObj, par, mu, v, m1.0, v1.0)
-    if( infl && !nlregObj$ws$homVar && !is.null(nlregObj$varPar) )
+#    if( infl && !nlregObj$ws$homVar && !is.null(nlregObj$varPar) )
+    if( infl && !is.null(nlregObj$varPar) )		## 14.06.13
     { 
       j.0 <- obsInfo.nlreg(nlregObj, m1=m1.0, m2=m2.0, v1=v1.0, 
                            v2=v2.0)
@@ -849,7 +908,8 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
                       j.0[names(vp), names(rc), drop=FALSE])
     }
   }
-  if( infl && !nlregObj$ws$homVar )
+#  if( infl && !nlregObj$ws$homVar )
+  if( infl )		## 14.06.13
   {
     newFrame <- eval(nlregObj$ws$frame)
     newFrame <- c(newFrame, as.list(nlregObj$coef))
@@ -878,39 +938,52 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
   {
     if(wantHoa)
     {
-      addVar <- diag(1, length(v))[, sset]
-      newData2 <- data.frame(cbind(newData, addVar))
-      lv <- lm((nlregObj$residual*sqrt(nlregObj$weights))~addVar-1)$coef
+      .addVar <- diag(1, length(v))[, sset]
+      ..newData2 <- data.frame(cbind(newData, .addVar))
+      lv <- lm((nlregObj$residual*sqrt(nlregObj$weights))~.addVar-1)$coef
       newCall$start["phi"] <- signif(lv, 4)
-      attach(newData2, warn.conflicts = FALSE)
-      ctrl <- try(eval(newCall), silent=TRUE)
+###      attach(..newData2, warn.conflicts = FALSE)		## 24.05.13
+      newCall$data <- as.name("..newData2")
+       ctrl <- try(eval(newCall), silent=TRUE)
       if( class(ctrl)[1] != "try-error" )
       {
         nlreg.temp <- eval(newCall)
         lv <- coef(nlreg.temp)["phi"]
         phi.h[sset] <- nlreg.temp$coef["phi"]
         logLik.1[sset] <- nlreg.temp$logLik
-        attach(nlreg.temp$data, warn.conflicts = FALSE)
+#        attach(nlreg.temp$data, warn.conflicts = FALSE)		## 20.05.13
         tmp <- as.list(nlreg.temp$ws$allPar)
+        tmp <- c(nlreg.temp$data, list(.addVar=.addVar), tmp)
+###        tmp <- c(nlreg.temp$data, tmp)
+        formals(md) <- tmp
         temp <- do.call("md", tmp)
         m1.1 <- attr(temp, "gradient") ; m1.1[!is.finite(m1.1)] <- 0
         m2.1 <- attr(temp, "hessian") ; m2.1[!is.finite(m2.1)] <- 0
         tmp <- as.list(nlregHoa$ws$allPar)
+        tmp <- c(nlreg.temp$data, list(.addVar=.addVar), tmp)
+###        tmp <- c(nlreg.temp$data, tmp)
+        formals(md) <- tmp
         temp <- do.call("md", tmp)
         m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
         if(!.probl) 
         {
           tmp <- as.list(nlreg.temp$ws$allPar)
+          tmp <- c(nlreg.temp$data, list(.addVar=.addVar), tmp)
+###          tmp <- c(nlreg.temp$data, tmp)
+          formals(vd) <- tmp
           temp <- do.call("vd", tmp)
           v1.1 <- attr(temp, "gradient") ; v1.1[!is.finite(v1.1)] <- 0
           v2.1 <- attr(temp, "hessian") ; v2.1[!is.finite(v2.1)] <- 0
           tmp <- as.list(nlregHoa$ws$allPar)
+          tmp <- c(nlreg.temp$data, list(.addVar=.addVar), tmp)
+###          tmp <- c(nlreg.temp$data, tmp)
+          formals(vd) <- tmp
           temp <- do.call("vd", tmp)
-	  v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
+	      v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
         }
         else v1.1 <- v2.1 <- v1.0 <- NULL
-        detach(nlreg.temp$data)
-        detach(newData2)
+#        detach(nlreg.temp$data)		## 20.05.13
+###        detach(..newData2)		## 24.05.13
         j.1[sset] <- det(obsInfo.nlreg(nlreg.temp, m1=m1.1, m2=m2.1, 
   	                               v1=v1.1, v2=v2.1))
         i.1[sset] <- det(expInfo.nlreg(nlreg.temp, m1=m1.1, v1=v1.1))
@@ -924,7 +997,8 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
         S.1[sset] <- det(S.temp)
       }
     }
-    if( infl && !nlregObj$ws$homVar )
+#    if( infl && !nlregObj$ws$homVar )		## 14.06.13
+    if( infl )
     {
       nlreg.temp <- update(nlregObj, subset=c(-sset), trace=FALSE)
       newFrame[names(nlreg.temp$coef)] <- nlreg.temp$coef
@@ -963,7 +1037,8 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
     }
     if(followUp)
     {
-      if(wantHoa || (infl && !nlregObj$ws$homVar))
+#      if(wantHoa || (infl && !nlregObj$ws$homVar))
+      if(wantHoa || infl)		## 14.06.13
 	cat(paste("\niteration", sset, "out of", length(v)))
       if( wantHoa )
       {
@@ -981,7 +1056,8 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
       }
   }
   if(followUp)  
-    if(wantHoa || (infl && !nlregObj$ws$homVar))  cat("\n")
+#    if(wantHoa || (infl && !nlregObj$ws$homVar))  cat("\n")    
+	 if(wantHoa || infl)  cat("\n")		## 14.06.13
   if(wantHoa)  
   {
     r.j <- sign(phi.h) * sqrt(2*(logLik.1-logLik.0))	
@@ -995,7 +1071,8 @@ nlreg.diag <- function(fitted, hoa = TRUE, infl = TRUE, trace = FALSE)
   if(wantHoa)
     diagObj <- c(diagObj, list( rj = r.j, rsj = rs.j ) )
   diagObj <- c(diagObj, list( h = hh, ha = ha, cook = cook ) )
-  if( infl && !nlregObj$ws$homVar )
+#  if( infl && !nlregObj$ws$homVar )
+  if( infl )		## 14.06.13
   {
     diagObj <- c(diagObj, list( ld = ld) )
     if( !is.null(nlregObj$varPar) )
@@ -1071,8 +1148,8 @@ plot.nlreg.diag <- function(x, which = "all", subset = NULL,
   {
     switch(pick, 
            "1" = { par(pty="s", mfrow=c(1,1))
-  		   close.screen(all = TRUE)
-		   split.screen(c(2, 2))
+  		   close.screen(all.screens = TRUE)
+		   split.screen(figs = c(2, 2))
 	           screen(1)       
 ##  Plot the studentized residuals against the fitted values
                    x1 <- nlregdiag$fitted
@@ -1153,7 +1230,7 @@ plot.nlreg.diag <- function(x, which = "all", subset = NULL,
 		     }
 		     else yes <- FALSE
 		   }
-		   close.screen(all=TRUE)
+		   close.screen(all.screens=TRUE)
 		   par(ask=FALSE)
 		 },
 
@@ -1309,7 +1386,7 @@ plot.nlreg.diag <- function(x, which = "all", subset = NULL,
 		     }
 		     else
 	             {			
-		       split.screen(fig=c(1,3))
+		       split.screen(figs=c(1,3))
 		       screen(1)
 		       plot(subset, nlregdiag$ld, xlab = "Case", 
                             ylab = "", main = "Global Influence", 
@@ -1360,7 +1437,7 @@ plot.nlreg.diag <- function(x, which = "all", subset = NULL,
 		         }
 		         else yes <- FALSE
 		       }	
-		       close.screen(all=TRUE)
+		       close.screen(all.screens=TRUE)
 		       par(ask=FALSE)
                      }
 		   }} )     
@@ -1388,7 +1465,7 @@ plot.nlreg.diag <- function(x, which = "all", subset = NULL,
                   title = "\n Make a plot selection (or 0 to exit)\n")
     if( (pick == 0) || (which != "all") )
     {
-      invisible(close.screen(all=TRUE))    
+      invisible(close.screen(all.screens=TRUE))    
       break
     }
   }       
@@ -1452,15 +1529,18 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
     	cat("\ndifferentiating variance function -- may take a while")
         vd <- Dvar(nlregObj)  
       }
-    attach(nlregObj$data, warn.conflicts = FALSE)
+#    attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
     tmp <- as.list(nlregObj$ws$allPar)
+    tmp <- c(nlregObj$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.1 <- attr(temp, "gradient") ; m1.1[!is.finite(m1.1)] <- 0
     m2.1 <- attr(temp, "hessian") ; m2.1[!is.finite(m2.1)] <- 0
+    formals(vd) <- tmp
     temp <- do.call("vd", tmp)
     v1.1 <- attr(temp, "gradient") ; v1.1[!is.finite(v1.1)] <- 0 
     v2.1 <- attr(temp, "hessian") ; v2.1[!is.finite(v2.1)] <- 0
-    detach(nlregObj$data)
+#    detach(nlregObj$data)		## 20.05.13
     logLik1 <- nlregObj$logLik
     mle <- if( idx1 )  nlregObj$coef[idx1]
              else nlregObj$varPar[idx2]		
@@ -1550,30 +1630,33 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
           r[next.idx] <- sqrt( 2* (logLik1-logLik0) ) * sign(mle-of)
           if(wantHoa)
           {
-            attach(nlregObj0$data, warn.conflicts = FALSE)
+#            attach(nlregObj0$data, warn.conflicts = FALSE)		## 20.05.13
             tmp <- as.list(nlregObj0$ws$allPar)
+            tmp <- c(nlregObj0$data, tmp)
+            formals(md) <- tmp
             temp <- do.call("md", tmp)
-  	    m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
+  	        m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
             m2.0 <- attr(temp, "hessian") ; m2.0[!is.finite(m2.0)] <- 0
             m1.00 <- m1.0[,names(rc), drop=FALSE]
-  	    m2.00 <- m2.0[,names(rc),names(rc), drop=FALSE]
+  	        m2.00 <- m2.0[,names(rc),names(rc), drop=FALSE]
+  	        formals(vd) <- tmp
             temp <- do.call("vd", tmp)
-  	    v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
-  	    v2.0 <- attr(temp, "hessian") ; v2.0[!is.finite(v2.0)] <- 0
-  	    if( (offsetName == "logs") && nlregObj0$ws$homVar )
-              { v1.00 <- v1.0 ; v2.00 <- v2.0 }
-  	    else if( !nlregObj0$ws$xVar)
-  	         {
-  		   v1.00 <- v1.0[, names(vp), drop=FALSE]
-  		   v2.00 <- v2.0[, names(vp), names(vp), drop=FALSE]
-  	         }
-  	         else
-  	         {
-  	           v1.00 <- v1.0[, c(names(rc), names(vp)), drop=FALSE]
-  		   v2.00 <- v2.0[, c(names(rc), names(vp)), 
-  	                           c(names(rc), names(vp)), drop=FALSE]
-  	         }
-  	    detach(nlregObj0$data)
+  	        v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
+  	        v2.0 <- attr(temp, "hessian") ; v2.0[!is.finite(v2.0)] <- 0
+  	        if( (offsetName == "logs") && nlregObj0$ws$homVar )
+            { v1.00 <- v1.0 ; v2.00 <- v2.0 }
+  	        else if( !nlregObj0$ws$xVar)
+  	        {
+  		      v1.00 <- v1.0[, names(vp), drop=FALSE]
+  		      v2.00 <- v2.0[, names(vp), names(vp), drop=FALSE]
+  	        }
+  	        else
+  	        {
+  	          v1.00 <- v1.0[, c(names(rc), names(vp)), drop=FALSE]
+  		      v2.00 <- v2.0[, c(names(rc), names(vp)), 
+  	                          c(names(rc), names(vp)), drop=FALSE]
+  	        }
+#  	    detach(nlregObj0$data)		## 20.05.13
             jt <- obsInfo.nlreg(nlregObj0, m1=m1.00, m2=m2.00, 
                                 v1=v1.00, v2=v2.00)
   	    Sh <- Shat.nlreg(nlregObj, nlregObj0, m1.1=m1.1, m1.0=m1.0,
@@ -1941,9 +2024,38 @@ plot.all.nlreg.profiles <- function(x = stop("nothing to plot"),
   invisible(x)	
 }		
 
-print.nlreg.profile <- plot.nlreg.profile 
+print.nlreg.profile <- function(x = stop("nothing to plot"), 
+                               alpha = 0.05, add.leg = FALSE, 
+                               stats = c("sk", "fr"), 
+                               cex = 0.7, cex.lab = 1, cex.axis = 1, 
+                               cex.main = 1, lwd1 = 1, lwd2 = 2, 
+                               lty1 = "solid", lty2 = "solid", 
+                               cl1 = "blue", cl2 = "red", 
+                               col = "black", ylim = c(-3,3), ...)
+plot.nlreg.profile(x = x, alpha = alpha, add.leg = add.leg, 
+                   stats = stats, cex = cex, 
+                   cex.lab = cex.lab, cex.axis = cex.axis, 
+                   cex.main = cex.main, lwd1 = lwd1, 
+                   lwd2 = lwd2, lty1 = lty1, lty2 = lty2, 
+                   cl1 = cl1, cl2 = cl2, col = col, 
+                   ylim = ylim, ...) 
 
-print.all.nlreg.profiles <- plot.all.nlreg.profiles
+print.all.nlreg.profiles <- function(x = stop("nothing to plot"), 
+                                    nframe, alpha = 0.05,  
+                                    stats = c("sk", "fr"), cex = 0.7, 
+                                    cex.lab = 1, cex.axis = 1, 
+                                    cex.main = 1, lwd1 = 1, lwd2 = 2, 
+                                    lty1 = "solid", lty2 = "solid", 
+                                    cl1 = "blue", cl2 = "red", 
+                                    col = "black", ylim = c(-3,3), 
+                                    ...)
+plot.all.nlreg.profiles(x = x, nframe = nframe, alpha = alpha,  
+                        stats = stats, cex = cex, 
+                        cex.lab = cex.lab, cex.axis = cex.axis, 
+                        cex.main = cex.main, lwd1 = lwd1, 
+                        lwd2 = lwd2, lty1 = lty1, lty2 = lty2, 
+                        cl1 = cl1, cl2 = cl2, col = col, 
+                        ylim = ylim, ...)
 
 contour.all.nlreg.profiles <- 
       function(x, offset1, offset2, alpha = c(0.1, 0.05), 
@@ -1993,7 +2105,7 @@ contour.all.nlreg.profiles <-
     if( notGiven )
     {
       split.screen(figs = c(npar,npar))
-      on.exit( close.screen(all = TRUE) )
+      on.exit( close.screen(all.screens = TRUE) )
     }
     else 
     {
@@ -2383,7 +2495,7 @@ plot.nlreg.contours <- function(x, alpha = c(0.1, 0.05),
   if( !fixed )
   {
     split.screen(figs = c(npar,npar))
-    on.exit( close.screen(all = TRUE) )
+    on.exit( close.screen(all.screens = TRUE) )
     para <- names(x)[1:npar]
     pos1 <- pos2 <- idx <- 0
     for( para1 in para )
@@ -2578,7 +2690,17 @@ plot.nlreg.contours <- function(x, alpha = c(0.1, 0.05),
   invisible(x)
 }
 
-print.nlreg.contours <- plot.nlreg.contours
+print.nlreg.contours <- function(x, alpha = c(0.1, 0.05), 
+                                drawlabels = FALSE, lwd1 = 1, 
+                                lwd2 = 1, lty1 = "solid", 
+                                lty2 = "solid", cl1 = "blue", 
+                                cl2 = "red", col = "black", pch1 = 1, 
+                                pch2 = 16, cex = 0.5, ...)
+plot.nlreg.contours(x = x, alpha = alpha, 
+                    drawlabels = drawlabels, lwd1 = lwd1, 
+                    lwd2 = lwd2, lty1 = lty1, lty2 = lty2, 
+                    cl1 = cl1, cl2 = cl2, col = col, 
+                    pch1 = pch1, pch2 = pch2, cex = cex, ...)
 
 summary.nlreg.profile <- function(object, alpha = 0.05, twoside = TRUE,
                          digits = NULL, ...)
@@ -2797,13 +2919,16 @@ mpl.nlreg <- function(fitted, offset = NULL, stats = c("sk", "fr"),
           cat("\ndifferentiating variance function -- may take a while")
           Dvar(nlregObj)
         }
-  attach(nlregObj$data, warn.conflicts = FALSE)	
+#  attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13	
   tmp <- as.list(nlregObj$ws$allPar)
+  tmp <- c(nlregObj$data, tmp)
+  formals(md) <- tmp
   temp <- do.call("md", tmp)
   m1 <- attr(temp, "gradient") ; m1[!is.finite(m1)] <- 0
+  formals(vd) <- tmp
   temp <- do.call("vd", tmp)
   v1 <- attr(temp, "gradient") ; v1[!is.finite(v1)] <- 0
-  detach(nlregObj$data)
+#  detach(nlregObj$data)		## 20.05.13
   if( stats == "fr" )
   {
     rh <- resid(nlregObj)  
@@ -2863,15 +2988,18 @@ mpl.nlreg <- function(fitted, offset = NULL, stats = c("sk", "fr"),
       nlreg.temp$weights <- den
       nlreg.temp$ws$allPar <- c(regCoef, varPar)  
       names(nlreg.temp$ws$allPar) <- c(rc, vp)
-      attach(nlreg.temp$data, warn.conflicts = FALSE)
+#      attach(nlreg.temp$data, warn.conflicts = FALSE)		## 20.05.13
       tmp <- as.list(nlreg.temp$ws$allPar)
+      tmp <- c(nlreg.temp$data, tmp)
+      formals(md) <- tmp
       temp <- do.call("md", tmp)
       m1.t <- attr(temp, "gradient") ; m1.t[!is.finite(m1.t)] <- 0
       m2.t <- attr(temp, "hessian") ; m2.t[!is.finite(m2.t)] <- 0
+      formals(vd) <- tmp
       temp <- do.call("vd", tmp)
       v1.t <- attr(temp, "gradient") ; v1.t[!is.finite(v1.t)] <- 0
       v2.t <- attr(temp, "hessian") ; v2.t[!is.finite(v2.t)] <- 0
-      detach(nlreg.temp$data)
+#      detach(nlreg.temp$data)		## 20.05.13
       if( stats == "sk" )
       {
         S.hat <- Shat.nlreg(nlregObj, nlreg.temp, m1.1=m1, m1.0=m1.t, 
@@ -3212,8 +3340,8 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
   .probl <- ( nlregObj$ws$homVar && !is.null(of) )
   if( .probl )
     .probl <- ( names(of) =="logs" )		
-  attach(nlregObj$data, warn.conflicts = FALSE)  
-  on.exit( detach(nlregObj$data) )
+#  attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
+#  on.exit( detach(nlregObj$data) )
   if( !nlregObj$ws$missingData )
   {
     mu <- mu[!duplicated(nlregObj$data$dupl)]
@@ -3222,11 +3350,16 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
   if( is.null(m1) || is.null(m2) )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- if( nlregObj$ws$hoa ) 
+            {     	      
+       	      formals(md) <- tmp
               do.call("md", tmp)
+            }  
             else  
             {
               tmp.fun <- Dmean(nlregObj)
+              formals(tmp.fun) <- tmp
               do.call("tmp.fun", tmp)
             }
     m1 <- attr(temp, "gradient") ; m1[!is.finite(m1)] <- 0
@@ -3235,11 +3368,16 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
   if( !.probl && ( is.null(v1) || is.null(v2) ) )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- if( nlregObj$ws$hoa )
+            {
+       	      formals(vd) <- tmp
               do.call("vd", tmp)
+            }  
             else  
             {
               tmp.fun <- Dvar(nlregObj)
+              formals(tmp.fun) <- tmp
               do.call("tmp.fun", tmp)
             }
     v1 <- attr(temp, "gradient") ; v1[!is.finite(v1)] <- 0         
@@ -3266,7 +3404,7 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
   {
     mat <- array(0, dim=rep(length(c(rc,vp)), 2))
     idx1 <- 1:length(nlregObj$coef)
-    if( !is.null(vp) ) idx2 <- length(idx1) +  1:length(vp)
+    if( !is.null(vp) ) idx2 <- length(idx1) +  1:length(vp)    
     mat[idx1,idx1] <- colSums( (1/2*repl/v) * 
                                ( if(nlregObj$ws$xVar) 
                                    v2[,idx1,idx1,drop=FALSE] else 0) + 
@@ -3290,7 +3428,7 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
                         )
   		      else 0
     if( !is.null(vp) )
-    {
+    {   	
       mat[idx1,idx2] <- if(nlregObj$ws$xVar)
   	                {
   	                  ( colSums( (1/2*repl/v)*v2[,idx1,idx2,
@@ -3302,7 +3440,7 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
                            crossprod(si/v^3*v1[,idx1,drop=FALSE],
                                      v1[,idx2,drop=FALSE]) ) -
                            crossprod(1/2/v^2*sir[,idx1,drop=FALSE],
-                                     v1[,idx2,drop=FALSE] )
+                                     v1[,idx2,drop=FALSE] ) 
                         }		  
                         else if( nlregObj$ws$hom )
                                - colSums( 1/2/v^2*sir[,idx1,
@@ -3310,7 +3448,7 @@ obsInfo.nlreg <- function(object, par, mu, v, m1 = NULL, m2 = NULL,
   			     else 
                                - crossprod(1/2/v^2*sir[,idx1,
                                                        drop=FALSE],
-                                           v1[,,drop=FALSE])
+                                           v1[,,drop=FALSE]) ##
       mat[idx2,idx1] <- t(mat[idx1,idx2])
       mat[idx2,idx2] <- if(nlregObj$ws$xVar)
                           ( colSums( (repl/2/v)*v2[,idx2,idx2,
@@ -3363,16 +3501,21 @@ expInfo.nlreg <- function(object, par, mu, v, m1=NULL, v1=NULL, ...)
   .probl <- ( nlregObj$ws$homVar && !is.null(of) )
   if(.probl)
     .probl <- ( names(of) =="logs" )
-  attach(nlregObj$data, warn.conflicts = FALSE)
-  on.exit( detach(nlregObj$data) )
+#  attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
+#  on.exit( detach(nlregObj$data) )
   if( is.null(m1) )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- if( nlregObj$ws$hoa )
+            { 
+        	  formals(md) <- tmp
               do.call("md", tmp)
+            }  
             else  
             {
               tmp.fun <- Dmean(nlregObj, hessian=FALSE)
+        	  formals(tmp.fun) <- tmp
               do.call("tmp.fun", tmp)
             }
     m1 <- attr(temp, "gradient")
@@ -3381,11 +3524,16 @@ expInfo.nlreg <- function(object, par, mu, v, m1=NULL, v1=NULL, ...)
   if(!.probl && is.null(v1)) 
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- if( nlregObj$ws$hoa )
+            {
+        	  formals(vd) <- tmp
               do.call("vd", tmp)
+            }  
             else  
             {
               tmp.fun <- Dvar(nlregObj, hessian=FALSE)
+              formals(tmp.fun) <- tmp
               do.call("tmp.fun", tmp)
             }
     v1 <- attr(temp, "gradient")
@@ -3435,8 +3583,8 @@ theta.deriv <- function(nlregObj, par, mu, v, m1=NULL, v1=NULL)
   .probl <- ( nlregObj$ws$homVar && !is.null(of) )
   if(.probl)
     .probl <- ( names(of) =="logs" )
-  attach(nlregObj$data, warn.conflicts = FALSE)
-  on.exit( detach(nlregObj$data) )
+#  attach(nlregObj$data, warn.conflicts = FALSE)		## 20.05.13
+#  on.exit( detach(nlregObj$data) )
   if( !nlregObj$ws$missingData )
   {
     mu <- mu[!duplicated(nlregObj$data$dupl)]
@@ -3446,14 +3594,18 @@ theta.deriv <- function(nlregObj, par, mu, v, m1=NULL, v1=NULL)
   if( is.null(m1) )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- Dmean(nlregObj, hessian=FALSE)
+    formals(temp) <- tmp
     temp <- do.call("temp", tmp)
     m1 <- attr(temp, "gradient") ; m1[!is.finite(m1)] <- 0
   }
   if( !.probl && is.null(v1) )
   {
     tmp <- as.list(par)
+    tmp <- c(nlregObj$data, tmp)
     temp <- Dvar(nlregObj, hessian=FALSE)
+    formals(temp) <- tmp
     temp <- do.call(temp, tmp)
     v1 <- attr(temp, "gradient")  ; v1[!is.finite(v1)] <- 0
   }
@@ -3501,16 +3653,20 @@ Shat.nlreg <- function(nlregObj1, nlregObj0, par.1, par.0,
   if( missing(mu.0) )  mu.0 <- nlregObj0$fitted
   if( missing(v.1) )  v.1 <- nlregObj1$weights
   if( missing(v.0) )  v.0 <- nlregObj0$weights
-  attach(nlregObj1$data, warn.conflicts = FALSE)
-  on.exit( detach(nlregObj1$data) )
+#  attach(nlregObj1$data, warn.conflicts = FALSE)		## 20.05.13
+#  on.exit( detach(nlregObj1$data) )
   if( is.null(m1.1) || is.null(m1.0) )
   {
     md <- if( nlregObj1$ws$hoa )  nlregObj1$ws$md
             else Dmean(nlregObj1, hessian=FALSE)
     tmp <- as.list(nlregObj1$ws$allPar)
+    tmp <- c(nlregObj1$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.1 <- attr(temp, "gradient") ; m1.1[!is.finite(m1.1)] <- 0
     tmp <- as.list(nlregObj0$ws$allPar)
+    tmp <- c(nlregObj1$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.0 <- attr(temp, "gradient") ; m1.0[!is.finite(m1.0)] <- 0
   }
@@ -3521,9 +3677,13 @@ Shat.nlreg <- function(nlregObj1, nlregObj0, par.1, par.0,
       vd <- if( nlregObj1$ws$hoa )  nlregObj1$ws$vd 
               else Dvar(nlregObj1, hessian=FALSE)
       tmp <- as.list(nlregObj1$ws$allPar)
+      tmp <- c(nlregObj1$data, tmp)
+      formals(vd) <- tmp
       temp <- do.call("vd", tmp)
       v1.1 <- attr(temp, "gradient") ; v1.1[!is.finite(v1.1)] <- 0
       tmp <- as.list(nlregObj0$ws$allPar)
+      tmp <- c(nlregObj1$data, tmp)
+      formals(temp) <- tmp
       temp <- do.call("vd", tmp)
       v1.0 <- attr(temp, "gradient") ; v1.0[!is.finite(v1.0)] <- 0
     }
@@ -3581,13 +3741,15 @@ qhat.nlreg <- function(nlregObj1, nlregObj0, par.1, par.0,
   if( missing(mu.0) )  mu.0 <- nlregObj0$fitted
   if( missing(v.1) )  v.1 <- nlregObj1$weights
   if( missing(v.0) )  v.0 <- nlregObj0$weights
-  attach(nlregObj1$data, warn.conflicts = FALSE)
-  on.exit( detach(nlregObj1$data) )
+#  attach(nlregObj1$data, warn.conflicts = FALSE)		## 20.05.13
+#  on.exit( detach(nlregObj1$data) )
   if( is.null(m1.1) )
   {
     md <- if( nlregObj1$ws$hoa )  nlregObj1$ws$md
             else Dmean(nlregObj1, hessian=FALSE)
     tmp <- as.list(nlregObj1$ws$allPar)
+    tmp <- c(nlregObj1$data, tmp)
+    formals(md) <- tmp
     temp <- do.call("md", tmp)
     m1.1 <- attr(temp, "gradient") ; m1.1[!is.finite(m1.1)] <- 0
   }
@@ -3598,6 +3760,8 @@ qhat.nlreg <- function(nlregObj1, nlregObj0, par.1, par.0,
       vd <- if( nlregObj1$ws$hoa )  nlregObj1$ws$vd
               else  Dvar(nlregObj1, hessian=FALSE)
       tmp <- as.list(nlregObj1$ws$allPar)
+      tmp <- c(nlregObj1$data, tmp)
+      formals(vd) <- tmp
       temp <- do.call("vd", tmp)
       v1.1 <- attr(temp, "gradient") ; v1.1[!is.finite(v1.1)] <- 0
     }

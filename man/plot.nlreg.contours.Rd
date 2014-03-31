@@ -65,6 +65,7 @@
   \code{\link[nlreg]{contour.all.nlreg.profiles}}
 }
 \examples{
+\dontrun{
 data(metsulfuron)
 metsulfuron.nl <- 
     nlreg( formula = log(area) ~ log( b1+(b2-b1) / (1+(dose/b4)^b3) ), 
@@ -75,7 +76,7 @@ metsulfuron.nl <-
 metsulfuron.prof <- profile( metsulfuron.nl, trace = TRUE )
 metsulfuron.cont <- contour( metsulfuron.prof, ret = TRUE, plotit = FALSE )
 par( mai = rep(0.2, 4) )
-plot( metsulfuron.cont )
+plot( metsulfuron.cont )}
 }
 \keyword{methods}
 \keyword{hplot}

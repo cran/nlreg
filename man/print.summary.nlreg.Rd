@@ -11,12 +11,13 @@
   \code{x}, \code{digits}, \code{signif.stars} and \code{quote}.
 }
 \usage{
-\method{print}{summary.nlreg}(x, digits = value, signif.stars = value, quote = TRUE, \dots)
+\method{print}{summary.nlreg}(x, digits, signif.stars, quote = TRUE, \dots)
 }
-\synopsis{
-\method{print}{summary.nlreg}(x, digits = max(3, getOption("digits")-3), 
-                              signif.stars = getOption("show.signif.stars"), 
-                              quote = TRUE, \dots)
+\details{
+  The function defaults to:
+\preformatted{print.summary.nlreg(x, digits = max(3, getOption("digits")-3), 
+                     signif.stars = getOption("show.signif.stars"), 
+                     quote = TRUE, \dots)}
 }
 \seealso{
   \code{\link[nlreg]{summary.nlreg}}, \code{\link[base]{print}}, 

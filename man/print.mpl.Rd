@@ -10,11 +10,12 @@
   function and for the interpretation of \code{x} and \code{digits}.
 }
 \usage{
-\method{print}{mpl}(x, digits = value, \dots)
+\method{print}{mpl}(x, digits, \dots)
 }
-\synopsis{
-\method{print}{mpl}(x, digits = max(3, getOption("digits")-3), \dots)
-}
+\details{
+  The function defaults to:
+\preformatted{print.mpl(x, digits = max(3, getOption("digits")-3), \dots)}
+}  
 \seealso{
   \code{\link[nlreg]{mpl.object}}, \code{\link[base]{print}},
   \code{\link[base]{print.default}} 
