@@ -9,3 +9,44 @@ import(
   statmod,
   survival
 )
+
+importFrom("graphics", "abline", "close.screen", "contour", "identify",
+           "legend", "lines", "locator", "matplot", "par", "plot",
+           "points", "screen", "split.screen", "text")
+importFrom("stats", "as.formula", "coef", "fitted", "lm",
+           "nls.control", "optim", "pnorm", "ppoints", "predict",
+           "printCoefmat", "qchisq", "qnorm", "resid", "residuals",
+           "smooth.spline", "spline", "update")
+importFrom("utils", "menu")
+
+S3method(coef, nlreg)
+S3method(contour, all.nlreg.profiles)
+S3method(expInfo, nlreg)
+S3method(fitted, nlreg)
+S3method(logLik, nlreg)
+S3method(mpl, nlreg)
+S3method(obsInfo, nlreg)
+S3method(param, nlreg)
+S3method(plot, all.nlreg.profiles)
+S3method(plot, nlreg.contours)
+S3method(plot, nlreg.diag)
+S3method(plot, nlreg.profile)
+S3method(print, all.nlreg.profiles)
+S3method(print, mpl)
+S3method(print, nlreg)
+S3method(print, nlreg.contours)
+S3method(print, nlreg.profile)
+S3method(print, summary.all.nlreg.profiles)
+S3method(print, summary.mpl)
+S3method(print, summary.nlreg)
+S3method(print, summary.nlreg.profile)
+S3method(profile, nlreg)
+S3method(residuals, nlreg)
+S3method(summary, all.nlreg.profiles)
+S3method(summary, mpl)
+S3method(summary, nlreg)
+S3method(summary, nlreg.profile)
+S3method(var2cor, mpl)
+S3method(var2cor, nlreg)
+S3method(var2cor, summary.mpl)
+S3method(var2cor, summary.nlreg)

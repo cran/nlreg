@@ -10,13 +10,13 @@ citEntry(entry="article",
          year     = "2005",
          pages    = "20--27",
          note     = "{ISSN} 609-3631",
-         url      = "ftp://cran.r-project.org/doc/Rnews/Rnews_2005-1.pdf",
+         url      = "https://www.r-project.org/doc/Rnews/Rnews_2005-1.pdf",
          
          textVersion = 
          paste("Brazzale, A.R. (2005).  hoa: An R package bundle for ", 
                "higher order likelihood inference.  Rnews, 5/1 ",
                "May 2005, 20-27.  ISSN 609-3631, ",
-               "URL ftp://cran.r-project.org/doc/Rnews/Rnews_2005-1.pdf.",
+               "URL https://www.r-project.org/doc/Rnews/Rnews_2005-1.pdf.",
                sep="")
          )
 citFooter("Examples of applications, and generally of the use of 
