@@ -1,15 +1,20 @@
 \name{nlreg-package}
-\Rdversion{1.1}
 \alias{nlreg-package}
 \docType{package}
 \title{
-Higher Order Inference for Nonlinear Heteroscedastic Models
+\packageTitle{nlreg}
 }
 \description{
-Likelihood inference based on higher order approximations
-for nonlinear models with possibly non constant variance
+\packageDescription{nlreg}
 }
 \details{
+
+The DESCRIPTION file:
+\packageDESCRIPTION{nlreg}
+\packageIndices{nlreg}
+Likelihood inference based on higher order approximations
+for nonlinear models with possibly non constant variance
+
 \tabular{ll}{
 Package: \tab nlreg\cr
 Version: \tab 1.2-0\cr
@@ -92,11 +97,20 @@ Further information is available in the following vignettes:
 }
 }
 \author{
-S original by Alessandra R. Brazzale <alessandra.brazzale@unimore.it>
-and Ruggero Bellio <ruggero.bellio@dss.uniud.it>.  R port by Alessandra R.
-Brazzale <alessandra.brazzale@unimore.it>, following earlier work by
-Douglas Bates.
+\packageAuthor{nlreg}
 
-Maintainer: Alessandra R. Brazzale <alessandra.brazzale@unimore.it>
+Maintainer: \packageMaintainer{nlreg}
+}
+\references{
+Brazzale, A.R. (2005).  hoa: An R package bundle for higher order likelihood inference.  Rnews, 5/1, May 2005, 20-27.  ISSN 609-3631.  URL: https://www.r-project.org/doc/Rnews/Rnews_2005-1.pdf
+
+Examples of applications, and generally of the use of likelihood asymptotics, are given in:
+Brazzale, A.R., Davison, A.C. and Reid, N. (2007).  Applied Asymptotics: Case Studies in Small-Sample Statistics.  Cambridge University Press, Cambridge.  
+URL: http://statwww.epfl.ch/AA/
 }
 \keyword{ package }
+\seealso{
+\code{\link[cond:cond-package]{cond}} 
+\code{\link[marg:marg-package]{marg}} 
+\code{\link[csampling:csampling-package]{csampling}} 
+}

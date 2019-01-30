@@ -57,14 +57,14 @@
   }
   \item{md}{
     a function definition that returns the first two derivatives of the
-    mean function; used by \code{\link[nlreg]{all.profiles.nlreg}}.  
+    mean function; used by \code{\link[nlreg]{allProfiles.nlreg}}.  
   }
   \item{vd}{
     a function definition that returns the first two derivatives of the
-    variance function; used by \code{\link[nlreg]{all.profiles.nlreg}}. 
+    variance function; used by \code{\link[nlreg]{allProfiles.nlreg}}. 
   }
   \item{all}{
-    logical switch used by \code{\link[nlreg]{all.profiles.nlreg}}.  
+    logical switch used by \code{\link[nlreg]{allProfiles.nlreg}}.  
   }
   \item{\dots}{
     absorbs any additional argument.

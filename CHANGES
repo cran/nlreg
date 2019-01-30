@@ -40,3 +40,11 @@ Version 1.2-2:
     o Fixed scoping rules
     
     o Generalized "nlreg.diag"
+    
+Version 1.2-2.2: 
+
+    o Updated to R version 3.5.0
+    
+    o Registered S3 methods
+
+    o all.profiles.nlreg function transformed to allProfiles.nlreg method

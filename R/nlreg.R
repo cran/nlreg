@@ -1,6 +1,6 @@
-## file nlreg/R/nlreg.R, v 1.2-2 2014-03-31
+## file nlreg/R/nlreg.R, v 1.2-2.2 2019-01-30
 ##
-##  Copyright (C) 2000-2014 Ruggero Bellio & Alessandra R. Brazzale 
+##  Copyright (C) 2000-2018 Ruggero Bellio & Alessandra R. Brazzale 
 ##
 ##  This file is part of the "nlreg" package for R.  This program is 
 ##  free software; you can redistribute it and/or modify it under the 
@@ -547,10 +547,8 @@ residuals.nlreg <- function(object, ...)
 
 resid.nlreg <- residuals.nlreg
 
-fitted.values.nlreg <- function(object, ...)
+fitted.nlreg <- function(object, ...)
   object$fitted
-
-fitted.nlreg <- fitted.values.nlreg
 
 summary.nlreg <- function(object, observed = TRUE, 
                           correlation = FALSE, digits = NULL, ...)
@@ -1483,7 +1481,7 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
     stop("\noffset parameter is already fixed!")
   offsetName <- paste(substitute(offset))
   if(offsetName == "all")
-    all.profiles.nlreg(fitted=nlregObj, hoa=hoa, signif=signif, 
+    allProfiles.nlreg(fitted=nlregObj, hoa=hoa, signif=signif, 
                        n=n, precision=precision, omit=omit, 
                        trace=trace, call=m, ...)
   else
@@ -1745,7 +1743,7 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
                 nlregObj0$varPar[names(nlregObj0$varPar)!="logs"])
   	      if(followUp)
   	      {
-  	        if( !any(match("all.profiles.nlreg", 
+  	        if( !any(match("allProfiles.nlreg", 
                                unlist(lapply(sys.calls(), 
                                              function(x) x[[1]])), 
                                nomatch=FALSE)) )
@@ -1773,7 +1771,7 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
                 nlregObj0$varPar[names(nlregObj0$varPar)!="logs"])
   	      if(followUp)
   	      {
-  	        if( !any(match("all.profiles.nlreg", 
+  	        if( !any(match("all.Profiles.nlreg", 
                                unlist(lapply(sys.calls(), 
                                              function(x) x[[1]])), 
                                nomatch=FALSE)) )
@@ -1790,7 +1788,7 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
   	  counter <- counter + 1
           if(followUp)
   	  {
-  	    if( !any(match("all.profiles.nlreg", 
+  	    if( !any(match("allProfiles.nlreg", 
                            unlist(lapply(sys.calls(), 
                                          function(x) x[[1]])), 
                            nomatch=FALSE)) )
@@ -1869,7 +1867,10 @@ profile.nlreg <- function(fitted, offset = "all", hoa = TRUE,
   }
 }
 
-all.profiles.nlreg <- function(fitted, hoa = TRUE, precision = 6, 
+allProfiles <- function(fitted, ...)  
+  UseMethod("allProfiles")
+
+allProfiles.nlreg <- function(fitted, hoa = TRUE, precision = 6, 
                                signif = 30, n = 50, omit = 0.5, 
                                trace = FALSE, call, ...)
 {

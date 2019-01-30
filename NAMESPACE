@@ -19,6 +19,7 @@ importFrom("stats", "as.formula", "coef", "fitted", "lm",
            "smooth.spline", "spline", "update")
 importFrom("utils", "menu")
 
+S3method(allProfiles, nlreg)
 S3method(coef, nlreg)
 S3method(contour, all.nlreg.profiles)
 S3method(expInfo, nlreg)

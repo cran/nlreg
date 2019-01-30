@@ -1,6 +1,5 @@
 \name{fitted.nlreg}
 \alias{fitted.nlreg}
-\alias{fitted.values.nlreg}
 \title{
   Use fitted() on a `nlreg' object
 }
@@ -12,7 +11,6 @@
 }
 \usage{
 \method{fitted}{nlreg}(object, \dots)
-\method{fitted.values}{nlreg}(object, \dots)
 }
 \seealso{
   \code{\link[nlreg]{nlreg.object}}, \code{\link{fitted}}

@@ -1,5 +1,5 @@
-\name{all.profiles.nlreg}
-\alias{all.profiles.nlreg}
+\name{allProfiles.nlreg}
+\alias{allProfiles.nlreg}
 \title{
   Support for function `profile.nlreg' 
 }
@@ -8,7 +8,7 @@
   It is not intended to be called directly by users.
 }
 \usage{
-\method{all.profiles}{nlreg}(fitted, hoa = TRUE, precision = 6, signif = 30, 
+\method{allProfiles}{nlreg}(fitted, hoa = TRUE, precision = 6, signif = 30, 
                    n = 50, omit = 0.5, trace = FALSE, call, \dots)
 }
 \arguments{
@@ -48,7 +48,7 @@
   }
 }
 \details{
-  The \code{all.profiles.nlreg} function is called internally by the 
+  The \code{allProfiles.nlreg} function is called internally by the 
   \code{\link[nlreg]{profile.nlreg}} routine.  It is not intended to 
   be called directly by users. 
 }
